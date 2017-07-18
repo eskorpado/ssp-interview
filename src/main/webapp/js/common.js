@@ -25,9 +25,9 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         return true;
     };
     $scope.changeOptions = function (selected, index) {
-        $scope.priorities[selected].show = index;
+        $scope.priorities[selected-1].show = index;
         $scope.priorities.forEach(function (item, i, arr) {
-            if (item.show == index && i != selected) {
+            if (item.show == index && i != selected-1) {
                 item.show = -1;
             }
         })
@@ -134,7 +134,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         {id: 16, value: "Решение начать работать в этой компании было, безусловно, ошибкой с моей стороны"}
     ];
     $scope.nextButton = function () {
-        $('#firstPart select, #firstPart input').filter('[required]:visible').each(function () {
+        /*$('#firstPart select, #firstPart input').filter('[required]:visible').each(function () {
             if ($(this).val() == "" || $(this).val() == null || $(this).val() == undefined)
                 $(this).parents('.form-group').addClass('has-error');
             else
@@ -146,7 +146,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             if ($(this).find("input").length > 0 && $(this).find("input:checked").length <= 0)
                 $(this).addClass('has-error');
 
-        });
+        });*/
         $('#firstPart .has-error select, #firstPart .has-error input').first().focus();
         if ($('#firstPart .has-error').length <= 0) {
             $('#firstPart').css('display', 'none');
@@ -156,34 +156,73 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
 
     $scope.finishButton = function () {
-        $('#secondPart .btn-group-vertical, #secondPart .btn-group').has("input[required]").each(function () {
+        /*$('#secondPart .btn-group-vertical, #secondPart .btn-group').has("input[required]").each(function () {
             $(this).removeClass('has-error');
             if ($(this).find("input").length > 0 && $(this).find("input:checked").length <= 0)
                 $(this).addClass('has-error');
 
-        });
+        });*/
 
         $('#secondPart .has-error select, #secondPart .has-error input').first().focus();
         if ($('#secondPart .has-error').length <= 0) {
-            var data = "";
-            $('select, textarea, input:text').each(function () {
-                data = data.concat($(this).attr("name"));
-                data = data.concat("=");
+            if(!$('#priorities input:text').val())
+            {
+                str = $('#priorities input:text').val(10);
+            }
+            else
+            {
+                var str = $('#priorities input:text').val();
+                str = str.replace(/"/g, '\\"');
+                $('#priorities input:text').val(str);
+            }
+
+            var data = "req={";
+            data = data + "priorities:{";
+            $('#priorities select, #priorities input:text').each(function (index) {
+                data = data + index + ":\"" + $(this).val() + "\",";
+                /*data = data.concat("\"");
                 data = data.concat($(this).val());
-                data = data.concat("&")
+                data = data.concat("\",")*/
             });
-            $('.btn-group-vertical, .btn-group').each(function () {
-                data = data.concat($(this).find("input:checked").attr("name"));
-                data = data.concat("=");
+            data = data.substring(0, data.lastIndexOf(","));
+            data = data.concat("},");
+
+            data = data.concat("\"fivepoint\" : [");
+            $('#fivepoint .btn-group-vertical, #fivepoint .btn-group').each(function () {
+                data = data.concat("\"");
                 data = data.concat($(this).find("input:checked").attr("value"));
-                data = data.concat("&")
+                data = data.concat("\",")
+            });
+            data = data.substring(0, data.lastIndexOf(","));
+            data = data.concat("],");
+
+            data = data.concat("\"yesno\" : [");
+            $('#yesno .btn-group').each(function () {
+                data = data.concat("\"");
+                data = data.concat($(this).find("input:checked").attr("value"));
+                data = data.concat("\",")
+            });
+            data = data.substring(0, data.lastIndexOf(","));
+            data = data.concat("],");
+
+            data = data.concat("\"question\" : ");
+            $('#question .btn-group-vertical').each(function () {
+                data = data.concat("\"");
+                data = data.concat($(this).find("input:checked").attr("value"));
+                data = data.concat("\",")
             });
 
-            data = data.substring(0, data.lastIndexOf("&"));
+            data = data.concat("\"additional\" : ");
+            $('#additional textarea').each(function () {
+                data = data.concat("\"");
+                data = data.concat($(this).val());
+                data = data.concat("\"")
+            });
+            data = data.concat("}");
 
             $.ajax({
                 type: 'POST',
-                url: 'http://jiraauto.tk/testForm/',
+                url: 'http://localhost:8080/tosheet',
                 data: data
             });
             $('#secondPart').css('display', 'none');

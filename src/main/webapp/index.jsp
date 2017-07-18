@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en" ng-app="sspInterviewApp">
 <head>
@@ -5,12 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Оценки удовлетворенности персонала</title>
+    <title>Оценки удовлетворенности персонала ${name}</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/common.css" rel="stylesheet">
-	
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -18,15 +19,15 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 
     <![endif]-->
-	
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="js/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
-<!-- Angular -->
-<script src="js/angular.min.js"></script>
-<!-- Common -->
-<script src="js/common.js"></script>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Angular -->
+    <script src="js/angular.min.js"></script>
+    <!-- Common -->
+    <script src="js/common.js"></script>
 </head>
 <body ng-controller="interviewCtrl">
 <div class="customHeader"></div>
@@ -48,16 +49,16 @@
                 </div>
             </div>
             <!-- FIRST SECTION -->
-            <div class="row top50">
+            <div class="row top50" id="priorities">
                 <div class="col-xs-12 alert alert-info" style="margin-left: 0">
                     <h4>1. Выстройте по степени значимости для Вас факторы, которые представлены ниже, первый - самый
                         значимый для Вас, далее по степени убывания, последний – самый незначительный:</h4>
                 </div>
-                <div class="form-group" ng-repeat="i in [0,1,2,3,4,5,6,7,8]">
+                <div class="form-group " ng-repeat="i in [0,1,2,3,4,5,6,7,8]">
                     <select class="col-xs-12 form-control" name="priority{{i}}" id="priority{{i}}" ng-model="selected"
                             ng-change="changeOptions(selected,{{i}})" required>
                         <option value="" disabled selected>Фактор с приоритетом {{i+1}}</option>
-                        <option ng-repeat="prio in priorities" value="{{$index}}" ng-hide="isHidden(i,prio)">
+                        <option ng-repeat="prio in priorities" value="{{$index+1}}" ng-hide="isHidden(i,prio)">
                             {{prio.label}}
                         </option>
                     </select>
@@ -67,7 +68,7 @@
                            placeholder="Инные (укажите):" required>
                 </div>
             </div>
-            <div class="row top50">
+            <div class="row top50" id="fivepoint">
                 <div class="col-xs-12 alert alert-info">
                     <h4>2. Оцените по пятибальной шкале следующие вопросы:</h4>
                 </div>
@@ -88,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row top50">
+            <div class="row top50" id="yesno">
                 <div class="col-xs-12 alert alert-info">
                     <h4>3. Ответьте да/нет на следующие вопросы:</h4>
                 </div>
@@ -104,7 +105,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row top50">
+            <div class="row top50" id="question">
                 <div class="col-xs-12 alert alert-info">
                     <h4>4. Отметьте, пожалуйста, то утверждение, которое соответствует Вашей позиции:</h4>
                 </div>
@@ -116,7 +117,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row top50">
+            <div class="row top50" id="additional">
                 <div class="col-xs-12 alert alert-info">
                     <h4>5. Если у Вас есть желание высказаться, напишите, пожалуйста, Ваши пожелания по улучшению
                         бизнеса нашей компании (Вы можете пропустить ответ на этот вопрос)</h4>
