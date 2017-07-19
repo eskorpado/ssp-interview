@@ -134,7 +134,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         {id: 16, value: "Решение начать работать в этой компании было, безусловно, ошибкой с моей стороны"}
     ];
     $scope.nextButton = function () {
-        /*$('#firstPart select, #firstPart input').filter('[required]:visible').each(function () {
+        $('#firstPart select, #firstPart input').filter('[required]:visible').each(function () {
             if ($(this).val() == "" || $(this).val() == null || $(this).val() == undefined)
                 $(this).parents('.form-group').addClass('has-error');
             else
@@ -146,7 +146,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             if ($(this).find("input").length > 0 && $(this).find("input:checked").length <= 0)
                 $(this).addClass('has-error');
 
-        });*/
+        });
         $('#firstPart .has-error select, #firstPart .has-error input').first().focus();
         if ($('#firstPart .has-error').length <= 0) {
             $('#firstPart').css('display', 'none');
@@ -156,79 +156,73 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
 
     $scope.finishButton = function () {
-        /*$('#secondPart .btn-group-vertical, #secondPart .btn-group').has("input[required]").each(function () {
+        $('#secondPart .btn-group-vertical, #secondPart .btn-group').has("input[required]").each(function () {
             $(this).removeClass('has-error');
             if ($(this).find("input").length > 0 && $(this).find("input:checked").length <= 0)
                 $(this).addClass('has-error');
 
-        });*/
+        });
 
         $('#secondPart .has-error select, #secondPart .has-error input').first().focus();
         if ($('#secondPart .has-error').length <= 0) {
-            if(!$('#priorities input:text').val())
-            {
-                str = $('#priorities input:text').val(10);
-            }
-            else
-            {
-                var str = $('#priorities input:text').val();
-                str = str.replace(/"/g, '\\"');
-                $('#priorities input:text').val(str);
-            }
-
-            var data = "req={";
-            data = data + "priorities:{";
-            $('#priorities select, #priorities input:text').each(function (index) {
-                data = data + index + ":\"" + $(this).val() + "\",";
-                /*data = data.concat("\"");
-                data = data.concat($(this).val());
-                data = data.concat("\",")*/
+            var items = [];
+            $('#priorities select').not('#last').each(function (index) {
+                items.push({name :index+1, value: $(this).val()});
             });
-            data = data.substring(0, data.lastIndexOf(","));
-            data = data.concat("},");
+            items.push({name : 10, value : $('#last option').not('.ng-hide').text()});
+            items.sort(function (a,b) {
+                if(parseInt(a.value) > parseInt(b.value)) {
+                    return 1;
+                }
+                if(a.value < b.value) {
+                    return -1;
+                }
+                return 0;
 
-            data = data.concat("\"fivepoint\" : [");
-            $('#fivepoint .btn-group-vertical, #fivepoint .btn-group').each(function () {
-                data = data.concat("\"");
-                data = data.concat($(this).find("input:checked").attr("value"));
-                data = data.concat("\",")
             });
-            data = data.substring(0, data.lastIndexOf(","));
-            data = data.concat("],");
 
-            data = data.concat("\"yesno\" : [");
+            var priorities = [];
+            items.forEach(function (element, index, array) {
+                priorities.push(element.name);
+            });
+
+            var other_priority = $('#firstPart input:text').val();
+
+            var fivepoint = [];
+            $('#fivepoint .btn-group').each(function () {
+               fivepoint.push(parseInt($(this).find('input:checked').val()));
+            });
+
+            var yesno = [];
             $('#yesno .btn-group').each(function () {
-                data = data.concat("\"");
-                data = data.concat($(this).find("input:checked").attr("value"));
-                data = data.concat("\",")
-            });
-            data = data.substring(0, data.lastIndexOf(","));
-            data = data.concat("],");
-
-            data = data.concat("\"question\" : ");
-            $('#question .btn-group-vertical').each(function () {
-                data = data.concat("\"");
-                data = data.concat($(this).find("input:checked").attr("value"));
-                data = data.concat("\",")
+                yesno.push(parseInt($(this).find('input:checked').val()));
             });
 
-            data = data.concat("\"additional\" : ");
-            $('#additional textarea').each(function () {
-                data = data.concat("\"");
-                data = data.concat($(this).val());
-                data = data.concat("\"")
+            var question = parseInt($('#question .btn-group-vertical').find('input:checked').val());
+            var additional = $('#additional textarea').val();
+
+            var loyality = [];
+            $('#loyality .btn-group').each(function () {
+                loyality.push(parseInt($(this).find('input:checked').val()));
             });
-            data = data.concat("}");
+
+            var req = {
+                priorities : priorities,
+                other_priority: other_priority,
+                fivepoint : fivepoint,
+                yesno : yesno,
+                question : question,
+                additional : additional,
+            };
 
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:8080/tosheet',
-                data: data
+                url: 'https://ssp-interview.appspot.com//tosheet',
+                data: "request="+JSON.stringify(req)
             });
             $('#secondPart').css('display', 'none');
             $('#thirdPart').css('display', 'block');
         }
-
     };
     $scope.previousButton = function () {
         $('#secondPart').css('display', 'none');

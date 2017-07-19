@@ -32,10 +32,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by KrutovBS on 18.07.2017.
@@ -43,7 +40,7 @@ import java.util.List;
 @WebServlet("/tosheet")
 public class ToSheets extends HttpServlet {
 
-    private String spreadsheetId = "";
+    private String spreadsheetId = "1XUUdErflFkHpzOSkH3QZOTsL45nXBRFQTIn5aOVCH1A";
     private Sheets service;
     private String refreshToken = "";
     private String clientId = "";
@@ -53,11 +50,77 @@ public class ToSheets extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = resp.getWriter();
-        /*try {
-            buildSheet(getAccessToken());
-        } catch (Exception ignored) {}*/
+        Collection<String> scopes = new ArrayList<>();
+        scopes.add("https://www.googleapis.com/auth/spreadsheets");
+        try {
+            buildSheet(scopes);
+        } catch (Exception e) {out.print(e.getMessage());}
+
+        String request = req.getParameter("request");
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(request);
+        JsonObject rootObject = element.getAsJsonObject();
+
+        //List<String> priorities = new ArrayList<>();
+        /*for (JsonElement el:
+             rootObject.get("priorities").getAsJsonArray()) {
+            priorities.add(el.getAsString());
+        }*/
+        List<String> priorities = Utils.jsotToList(rootObject,"priorities");
+        String otherPriority = rootObject.get("other_priority").getAsString();
+        List<String> fivepoint = Utils.jsotToList(rootObject,"fivepoint");
+        List<String> yesno = Utils.jsotToList(rootObject,"yesno");
+        String question = rootObject.get("question").getAsString();
+        String additional = rootObject.get("additional").getAsString();
 
 
+
+        try {
+            String range = "'Sh1'!A1:A1";
+            ValueRange respo = new ValueRange();
+            respo.setRange(range);
+            respo.setMajorDimension("ROWS");
+            List<List<Object>> values = new ArrayList<>();
+            List<Object> value = new ArrayList<>();
+            value.add(0, additional);
+            values.add(0, value);
+            respo.setValues(values);
+
+            BatchUpdateValuesRequest batchRequest = new BatchUpdateValuesRequest();
+            batchRequest.setValueInputOption("RAW");
+
+            List<ValueRange> updateValueRangeList = new ArrayList<>();
+            updateValueRangeList.add(respo);
+
+            batchRequest.setData(updateValueRangeList);
+
+            BatchUpdateValuesResponse updateResponse = service.spreadsheets().
+                    values().batchUpdate(spreadsheetId, batchRequest).
+                    execute();
+        } catch (Exception e)
+        {
+            out.println(e.getMessage());
+            for (StackTraceElement el:
+                 e.getStackTrace()) {
+                out.println(el.getClass());
+            }
+        }
+
+        for (String s:
+             priorities) {
+            out.print(s);
+        }
+        out.print("\n");
+        for (String s:
+                fivepoint) {
+            out.print(s);
+        }
+        out.print("\n");
+        for (String s:
+                yesno) {
+            out.print(s);
+        }
+        /*
         String request = req.getParameter("req");
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(request);
@@ -89,7 +152,7 @@ public class ToSheets extends HttpServlet {
         for (String string : myList)
         {
             out.println(string);
-        }
+        }*/
 
         /*JsonArray fivepoint = rootObject.get("fivepoint").getAsJsonArray();
         JsonArray yesno = rootObject.get("yesno").getAsJsonArray();
@@ -128,8 +191,10 @@ public class ToSheets extends HttpServlet {
         return rootObject.get("access_token").getAsString();
     }
 
-    private void buildSheet (String access_token) throws GeneralSecurityException, IOException {
-        GoogleCredential credential = new GoogleCredential().setAccessToken(access_token);
+    private void buildSheet (Collection<String> scopes) throws GeneralSecurityException, IOException {
+        //GoogleCredential credential = new GoogleCredential().setAccessToken(access_token);
+        GoogleCredential credential = new GoogleCredential().getApplicationDefault();
+        credential.createScoped(scopes);
         HttpTransport httpTransport = null;
         httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         service =  new Sheets.Builder(httpTransport, JacksonFactory.getDefaultInstance(),credential).setApplicationName("SSP-Interview").build();

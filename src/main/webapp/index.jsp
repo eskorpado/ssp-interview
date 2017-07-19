@@ -54,7 +54,7 @@
                     <h4>1. Выстройте по степени значимости для Вас факторы, которые представлены ниже, первый - самый
                         значимый для Вас, далее по степени убывания, последний – самый незначительный:</h4>
                 </div>
-                <div class="form-group " ng-repeat="i in [0,1,2,3,4,5,6,7,8]">
+                <div class="form-group" ng-repeat="i in [0,1,2,3,4,5,6,7,8]">
                     <select class="col-xs-12 form-control" name="priority{{i}}" id="priority{{i}}" ng-model="selected"
                             ng-change="changeOptions(selected,{{i}})" required>
                         <option value="" disabled selected>Фактор с приоритетом {{i+1}}</option>
@@ -63,6 +63,9 @@
                         </option>
                     </select>
                 </div>
+                <select ng-model="selected" id="last" ng-hide="true">
+                    <option ng-repeat="prio in priorities" value="{{$index+1}}" ng-hide="isHidden(i,prio)">{{$index+1}}</option>
+                </select>
                 <div class="form-group" ng-hide="isOthers()">
                     <input type="text" class="form-control col-xs-12" name="priority_other" id="otherPriorities"
                            placeholder="Инные (укажите):" required>
@@ -139,7 +142,7 @@
                     <h1>Оценка уровня лояльности сотрудников</h1>
                 </div>
             </div>
-            <div class="row top20">
+            <div class="row top20" id="loyality">
                 <div class="col-xs-12 alert alert-info" style="margin-left: 0">
                     <h4>Вам предложено несколько вопросов, выражающих разнообразные чувства, которые Вы может испытывать
                         к

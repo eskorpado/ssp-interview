@@ -47,6 +47,9 @@ gretty {
 }
 
 appengine {
+    run {
+        jvmFlags = ['-Dappengine.fullscan.seconds=5']
+    }
 
     deploy {   // deploy configuration
         stopPreviousVersion = true  // default - stop the current version
