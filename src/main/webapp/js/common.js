@@ -59,24 +59,37 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         },
         {
             id: 8,
-            value: "Если вы имеете дополнительный источник дохода в виде подработки, оцените насколько он значим для Вас?"
-        },
-        {
-            id: 9,
             value: "Понимаете ли Вы принцип начисления дополнительных бонусов к заработной плате и что нужно делать для их получения?"
         },
         {
-            id: 10,
+            id: 9,
             value: "Прикладываете ли Вы усилия для достижения больших результатов и получения дополнительных бонусов?"
         },
         {
-            id: 11,
+            id: 10,
             value: "Учитываются ли Ваши усилия и достижения при начислении бонусов руководителем направления?"
         },
+        {id: 11, value: "Имеете ли Вы возможность повышения своей квалификации?"},
         {id: 12, value: "Имеете ли Вы возможность повышения своей квалификации?"},
         {id: 13, value: "Устраивают ли Вас взаимоотношения с коллегами по работе?"},
-        {id: 14, value: "Устраивает ли вас состояние вспомогательных помещений (кухня, душ…)?"}
+        {id: 14, value: "Устраивает ли вас состояние вспомогательных помещений (кухня, душ…)?"},
+
+        {
+            id: 15,
+            value: "Если вы имеете дополнительный источник дохода в виде подработки, оцените насколько он значим для Вас?"
+        }
     ];
+    $scope.incomes = function () {
+        alert($('#fivepoint .btn-group').last().find('input:checked').text());
+      if (parseInt($('#fivepoint .btn-group').last().find('input:checked').text()) > 0)
+      {
+          return false;
+      }
+      else {
+          return true;
+      }
+
+    };
 
     $scope.yesno = [
         {id: 0, value: "Дает ли уверенность в завтрашнем дне работа в компании?"},
@@ -115,7 +128,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             value: "С таким же успехом я работал бы в любой другой компании, если бы можно было выполнять аналогичную работу"
         },
         {id: 8, value: "Моя компания действительно вдохновляет меня работать как можно лучше"},
-        {id: 9, value: "Моя компания действительно вдохновляет меня работать как можно лучше"},
+        {id: 9, value: "Моя компания действительно вдохновляет меня работать как можно лучше"}, //TODO КОСЯК//
         {
             id: 10,
             value: "Требуются очень незначительные изменения в моих личных обстоятельствах, чтобы я оставил работу в этой компании"
@@ -192,6 +205,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             $('#fivepoint .btn-group').each(function () {
                fivepoint.push(parseInt($(this).find('input:checked').val()));
             });
+            fivepoint.push(parseInt($('#incomes').val()));
 
             var yesno = [];
             $('#yesno .btn-group').each(function () {
@@ -217,7 +231,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
             $.ajax({
                 type: 'POST',
-                url: 'https://ssp-interview.appspot.com//tosheet',
+                url: 'https://ssp-interview.appspot.com/tosheet',
                 data: "request="+JSON.stringify(req)
             });
             $('#secondPart').css('display', 'none');

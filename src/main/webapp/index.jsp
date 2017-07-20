@@ -91,6 +91,10 @@
                         </label>
                     </div>
                 </div>
+                <div class="col-xs-12 top20" ng-hide="incomes()">
+                    <h4>Как много времени вы тратите на него? Указать в часах в неделю</h4>
+                    <input type="text" class="form-control col-xs-12" name="incomes" id="incomes" required>
+                </div>
             </div>
             <div class="row top50" id="yesno">
                 <div class="col-xs-12 alert alert-info">

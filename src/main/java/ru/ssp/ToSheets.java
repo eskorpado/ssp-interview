@@ -1,12 +1,17 @@
 package ru.ssp;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
+import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -41,197 +46,78 @@ import java.util.*;
 public class ToSheets extends HttpServlet {
 
     private String spreadsheetId = "1XUUdErflFkHpzOSkH3QZOTsL45nXBRFQTIn5aOVCH1A";
-    private Sheets service;
-    private String refreshToken = "";
-    private String clientId = "";
-    private String clientSecret = "";
+    public HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+    public JsonFactory JSON_FACTORY = new JacksonFactory();
+    public AppIdentityCredential CREDENTIAL = new AppIdentityCredential(SheetsScopes.all());
+    public Sheets service = new Sheets.Builder(HTTP_TRANSPORT,JSON_FACTORY,CREDENTIAL).setApplicationName("SSP-Interview").build();
 
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=utf-8");
         PrintWriter out = resp.getWriter();
-        Collection<String> scopes = new ArrayList<>();
-        scopes.add("https://www.googleapis.com/auth/spreadsheets");
-        try {
-            buildSheet(scopes);
-        } catch (Exception e) {out.print(e.getMessage());}
 
         String request = req.getParameter("request");
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(request);
         JsonObject rootObject = element.getAsJsonObject();
 
-        //List<String> priorities = new ArrayList<>();
-        /*for (JsonElement el:
-             rootObject.get("priorities").getAsJsonArray()) {
-            priorities.add(el.getAsString());
-        }*/
         List<String> priorities = Utils.jsotToList(rootObject,"priorities");
         String otherPriority = rootObject.get("other_priority").getAsString();
         List<String> fivepoint = Utils.jsotToList(rootObject,"fivepoint");
         List<String> yesno = Utils.jsotToList(rootObject,"yesno");
-        String question = rootObject.get("question").getAsString();
+        List<String> question = new ArrayList<String>(){{add(rootObject.get("question").getAsString());}};
         String additional = rootObject.get("additional").getAsString();
 
-
-
-        try {
-            String range = "'Sh1'!A1:A1";
-            ValueRange respo = new ValueRange();
-            respo.setRange(range);
-            respo.setMajorDimension("ROWS");
-            List<List<Object>> values = new ArrayList<>();
-            List<Object> value = new ArrayList<>();
-            value.add(0, additional);
-            values.add(0, value);
-            respo.setValues(values);
-
-            BatchUpdateValuesRequest batchRequest = new BatchUpdateValuesRequest();
-            batchRequest.setValueInputOption("RAW");
-
-            List<ValueRange> updateValueRangeList = new ArrayList<>();
-            updateValueRangeList.add(respo);
-
-            batchRequest.setData(updateValueRangeList);
-
-            BatchUpdateValuesResponse updateResponse = service.spreadsheets().
-                    values().batchUpdate(spreadsheetId, batchRequest).
-                    execute();
-        } catch (Exception e)
-        {
-            out.println(e.getMessage());
-            for (StackTraceElement el:
-                 e.getStackTrace()) {
-                out.println(el.getClass());
-            }
-        }
-
-        for (String s:
-             priorities) {
-            out.print(s);
-        }
-        out.print("\n");
-        for (String s:
-                fivepoint) {
-            out.print(s);
-        }
-        out.print("\n");
-        for (String s:
-                yesno) {
-            out.print(s);
-        }
-        /*
-        String request = req.getParameter("req");
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(request);
-        JsonObject rootObject = element.getAsJsonObject();
-        JsonObject priorities = rootObject.get("priorities").getAsJsonObject();
-        Map<String,String> mymap = new HashMap<>();
-        for (String key:
-             priorities.keySet()) {
-            out.println(priorities.get(key).getAsString());
-        }
-        for (String key:
-                priorities.keySet()) {
-            out.println(key);
-        }
-        for (String key:
-                priorities.keySet()) {
-            mymap.put(priorities.get(key).getAsString(),key);
-        }
-        mymap = MapUtil.sortByValue(mymap);
-        for (String key: mymap.keySet())
-        {
-            out.println(key + " : " + mymap.get(key));
-        }
-        List<String> myList = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
-            myList.add(mymap.get(i+""));
-        }
-
-        for (String string : myList)
-        {
-            out.println(string);
-        }*/
-
-        /*JsonArray fivepoint = rootObject.get("fivepoint").getAsJsonArray();
-        JsonArray yesno = rootObject.get("yesno").getAsJsonArray();
-        JsonArray loyality = rootObject.get("loyality").getAsJsonArray();*/
+        String columnToInsert = getColumnToInsert("Результаты Ланит");
+        List<String> id = new ArrayList<>();
+        //updateSheets("Результаты Ланит", "priorities", id,columnToInsert);
+        updateSheets("Результаты Ланит", "priorities", priorities,columnToInsert);
+        updateSheets("Результаты Ланит", "fivepoint", fivepoint,columnToInsert);
+        updateSheets("Результаты Ланит", "yesno", yesno,columnToInsert);
+        updateSheets("Результаты Ланит", "question", question,columnToInsert);
     }
 
-    private String getAccessToken () throws IOException
-    {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost("https://www.googleapis.com/oauth2/v4/token");
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair("client_id", clientId)); //Новый
-        nvps.add(new BasicNameValuePair("client_secret", clientSecret));
-        nvps.add(new BasicNameValuePair("refresh_token", refreshToken));
-        nvps.add(new BasicNameValuePair("grant_type", "refresh_token"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-
-
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-        String line;
-        String answer = "";
-        while ((line = in.readLine()) != null)
-        {
-            answer+=line;
-        }
-
-        response.close();
-
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(answer);
-        JsonObject rootObject = element.getAsJsonObject();
-        return rootObject.get("access_token").getAsString();
-    }
-
-    private void buildSheet (Collection<String> scopes) throws GeneralSecurityException, IOException {
-        //GoogleCredential credential = new GoogleCredential().setAccessToken(access_token);
-        GoogleCredential credential = new GoogleCredential().getApplicationDefault();
-        credential.createScoped(scopes);
-        HttpTransport httpTransport = null;
-        httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-        service =  new Sheets.Builder(httpTransport, JacksonFactory.getDefaultInstance(),credential).setApplicationName("SSP-Interview").build();
-    }
-
-    private void updateSheets (String sheetId, String type, List<String> data) throws IOException
+    private void updateSheets (String sheetId, String type, List data,String columnToInsert) throws IOException
     {
         ArrayList<String> rows = new ArrayList<>();
         switch (type)
         {
+            //case "id" : rows.add("1"); rows.add("1");
+            //break;
             case "priorities": rows.add("2"); rows.add("11");
                 break;
             case "fivepoint" : rows.add("14"); rows.add("30");
                 break;
-            case "yesno" : rows.add("2"); rows.add("37");
+            case "yesno" : rows.add("33"); rows.add("37");
                 break;
-            case "question" : rows.add(40+Integer.parseInt(data.get(0))+""); rows.add(40+Integer.parseInt(data.get(0))+"");
+            case "question" : rows.add(40+Integer.parseInt(data.get(0)+"")+""); rows.add(40+Integer.parseInt(data.get(0)+"")+"");
                 break;
         }
 
-        String column = getLastColumn(sheetId);
+        String column = columnToInsert;
 
         String range =  "'" + sheetId + "'!" + column + rows.get(0) + ":" + column + rows.get(1);
         ValueRange resp = new ValueRange();
         resp.setRange(range);
-        resp.setMajorDimension("ROWS");
+        resp.setMajorDimension("COLUMNS");
         List<List<Object>> values = new ArrayList<>();
-        List<Object> value = new ArrayList<>();
+        /*List<Object> value = new ArrayList<>();
         for (String s:
              data) {
-            value.add(0,s);
-            values.add(0, value);
+            value.add(s);
+
         }
+        value.addAll()*/
+        values.add(data);
         resp.setValues(values);
 
         BatchUpdateValuesRequest batchRequest = new BatchUpdateValuesRequest();
         batchRequest.setValueInputOption("RAW");
+        List<Request> requests = new ArrayList<>();
+
 
         List<ValueRange> updateValueRangeList = new ArrayList<>();
         updateValueRangeList.add(resp);
@@ -277,11 +163,22 @@ public class ToSheets extends HttpServlet {
                 execute();
     }
 
-    private String getLastColumn(String sheetId) throws IOException
+    private String getColumnToInsert(String sheetId) throws IOException
     {
-        String range = "'" + sheetId + "'!1:1";
-        ValueRange resp = service.spreadsheets().values().get(spreadsheetId,range).execute();
-        resp.setMajorDimension("ROWS");
-        return resp.getValues().size()+"";
+        String range = "'" + sheetId + "'!A2:Z2";
+        ValueRange resp = service.spreadsheets().values().get(spreadsheetId,range).setMajorDimension("COLUMNS").execute();
+        int fistChar = 0;
+        int secondChar = resp.getValues().size()+1;
+        while (secondChar>26)
+        {
+            fistChar++;
+            secondChar-=26;
+        }
+        Request request = new Request();
+        request.getAutoResizeDimensions();
+        if(fistChar>0)
+            return (char)(fistChar+64)+""+(char)(secondChar+64);
+        else
+            return (char)(secondChar+64)+"";
     }
 }

@@ -34,6 +34,8 @@ dependencies {
     compile("com.google.code.gson:gson:2.8.1")
     compile('com.google.apis:google-api-services-sheets:v4-rev478-1.22.0')
     compile('org.apache.commons:commons-lang3:3.6')
+    compile('com.google.appengine:appengine-api-1.0-sdk:1.9.54')
+    compile('com.google.api-client:google-api-client-appengine:1.22.0')
 
 // Add your dependencies here.
 
@@ -63,3 +65,5 @@ version = '1.0-SNAPSHOT'          // Version in generated output
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
