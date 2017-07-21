@@ -49,7 +49,17 @@
                 </div>
             </div>
             <!-- FIRST SECTION -->
-            <div class="row top50" id="priorities">
+            <div class="row top20" id="team">
+                <div class="form-group">
+                    <select class="col-xs-12 form-control" name="priority{{i}}" required>
+                        <option value="" disabled selected>Выберите вашу команду:</option>
+                        <option ng-repeat="team in teams" value="{{$index+1}}">
+                            {{team.label}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row top20" id="priorities">
                 <div class="col-xs-12 alert alert-info" style="margin-left: 0">
                     <h4>1. Выстройте по степени значимости для Вас факторы, которые представлены ниже, первый - самый
                         значимый для Вас, далее по степени убывания, последний – самый незначительный:</h4>
@@ -85,15 +95,15 @@
                 </div>
                 <div class="col-xs-12 top20" ng-repeat="fp in fivepoint">
                     <h4>{{fp.value}}</h4>
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-default" ng-repeat="i in [0,1,2,3,4,5]">
-                            <input type="radio" name="fivepoint{{fp.id}}" value="{{i}}" required> {{i}}
+                    <div class="btn-group" data-toggle="buttons" >
+                        <label class="btn btn-default" ng-repeat="i in [0,1,2,3,4,5]" >
+                            <input type="radio" name="fivepoint{{fp.id}}" value="{{i}}" required onchange="showIncomes($(this))"> {{i}}
                         </label>
                     </div>
                 </div>
-                <div class="col-xs-12 top20" ng-hide="incomes()">
+                <div class="col-xs-12 top20 form-group" id="incomes" style="display: none">
                     <h4>Как много времени вы тратите на него? Указать в часах в неделю</h4>
-                    <input type="text" class="form-control col-xs-12" name="incomes" id="incomes" required>
+                    <input type="text" class="form-control col-xs-12" name="incomes"  required onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
                 </div>
             </div>
             <div class="row top50" id="yesno">
@@ -199,9 +209,5 @@
         </div>
     </div>
 </div>
-
-
-
-
 </body>
 </html>

@@ -1,6 +1,12 @@
 (function(){
 var sspInterviewApp = angular.module("sspInterviewApp", []);
 sspInterviewApp.controller("interviewCtrl", function ($scope) {
+    $scope.teams = [
+        {value: 0, label: "CAS"},
+        {value: 0, label: "СБУ"},
+        {value: 0, label: "ТЭК"},
+        {value: 0, label: "Ланит"}
+    ];
     $scope.priorities = [
         {value: 0, label: "Содержание работы (интересные, значимые для Вас задачи,  проекты и др.)", show: -1},
         {value: 1, label: "Уровень оплаты труда (зарплата, премии)", show: -1},
@@ -69,7 +75,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             id: 10,
             value: "Учитываются ли Ваши усилия и достижения при начислении бонусов руководителем направления?"
         },
-        {id: 11, value: "Имеете ли Вы возможность повышения своей квалификации?"},
+        {id: 11, value: "Имеете ли Вы возможность продвижения по карьерной лестнице?"},
         {id: 12, value: "Имеете ли Вы возможность повышения своей квалификации?"},
         {id: 13, value: "Устраивают ли Вас взаимоотношения с коллегами по работе?"},
         {id: 14, value: "Устраивает ли вас состояние вспомогательных помещений (кухня, душ…)?"},
@@ -79,17 +85,28 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             value: "Если вы имеете дополнительный источник дохода в виде подработки, оцените насколько он значим для Вас?"
         }
     ];
+
+
     $scope.incomes = function () {
-        alert($('#fivepoint .btn-group').last().find('input:checked').text());
-      if (parseInt($('#fivepoint .btn-group').last().find('input:checked').text()) > 0)
+        //alert($('#fivepoint .btn-group').last().find('input:checked').text());
+        alert('in scope');
+        //alert(parseInt($('#fivepoint .btn-group').last().find('input:checked').parent().text()))
+      /*if ($('#fivepoint .btn-group').last().find('input:checked').text() != "")
       {
-          return false;
+          $scope.hideIncomes = true;
       }
       else {
-          return true;
-      }
-
+          $scope.hideIncomes = false;
+      }*/
     };
+
+    $('input [type=radio][name=fivepoint15]').change(function () {
+       alert($(this).parent().text());
+    });
+
+
+    $scope.hideIncomes = true;
+
 
     $scope.yesno = [
         {id: 0, value: "Дает ли уверенность в завтрашнем дне работа в компании?"},
@@ -123,28 +140,23 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             id: 6,
             value: "С таким же успехом я работал бы в любой другой компании, если бы можно было выполнять аналогичную работу"
         },
+        {id: 7, value: "Моя компания действительно вдохновляет меня работать как можно лучше"},
         {
-            id: 7,
-            value: "С таким же успехом я работал бы в любой другой компании, если бы можно было выполнять аналогичную работу"
-        },
-        {id: 8, value: "Моя компания действительно вдохновляет меня работать как можно лучше"},
-        {id: 9, value: "Моя компания действительно вдохновляет меня работать как можно лучше"}, //TODO КОСЯК//
-        {
-            id: 10,
+            id: 8,
             value: "Требуются очень незначительные изменения в моих личных обстоятельствах, чтобы я оставил работу в этой компании"
         },
         {
-            id: 11,
+            id: 9,
             value: "Я очень рад, что выбрал именно эту компанию, когда искал работу и рассматривал другие предложения"
         },
-        {id: 12, value: "Не имеет смысла надолго задерживаться в этой компании "},
+        {id: 10, value: "Не имеет смысла надолго задерживаться в этой компании "},
         {
-            id: 13,
+            id: 11,
             value: "Во многих случаях я не согласен с основными направлениями политики компании по отношению к своим сотрудникам"
         },
-        {id: 14, value: "Мне действительно небезразлична судьба компании"},
-        {id: 15, value: "Для меня это самая лучшая из компаний, где я мог бы работать"},
-        {id: 16, value: "Решение начать работать в этой компании было, безусловно, ошибкой с моей стороны"}
+        {id: 12, value: "Мне действительно небезразлична судьба компании"},
+        {id: 13, value: "Для меня это самая лучшая из компаний, где я мог бы работать"},
+        {id: 14, value: "Решение начать работать в этой компании было, безусловно, ошибкой с моей стороны"}
     ];
     $scope.nextButton = function () {
         $('#firstPart select, #firstPart input').filter('[required]:visible').each(function () {
@@ -161,7 +173,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
         });
         $('#firstPart .has-error select, #firstPart .has-error input').first().focus();
-        if ($('#firstPart .has-error').length <= 0) {
+        if ($('#firstPart .has-error:visible').length <= 0) {
             $('#firstPart').css('display', 'none');
             $('#secondPart').css('display', 'block');
         }
@@ -194,6 +206,8 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
             });
 
+            var team = $('#team select').val();
+
             var priorities = [];
             items.forEach(function (element, index, array) {
                 priorities.push(element.name);
@@ -205,7 +219,11 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             $('#fivepoint .btn-group').each(function () {
                fivepoint.push(parseInt($(this).find('input:checked').val()));
             });
-            fivepoint.push(parseInt($('#incomes').val()));
+            if ($('#incomes input').val().length > 0) {
+                fivepoint.push(parseInt($('#incomes input').val()));
+            }else{
+                fivepoint.push(0);
+            }
 
             var yesno = [];
             $('#yesno .btn-group').each(function () {
@@ -219,14 +237,20 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             $('#loyality .btn-group').each(function () {
                 loyality.push(parseInt($(this).find('input:checked').val()));
             });
+            var inverse = [2,6,8,10,11,14];
+            inverse.forEach(function (element) {
+               loyality[element] = 5 - loyality[element];
+            });
 
             var req = {
+                team : team,
                 priorities : priorities,
                 other_priority: other_priority,
                 fivepoint : fivepoint,
                 yesno : yesno,
                 question : question,
                 additional : additional,
+                loyality: loyality
             };
 
             $.ajax({
@@ -243,4 +267,15 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         $('#firstPart').css('display', 'block');
     }
 });
+
 })();
+var showIncomes = function (selec) {
+    if(parseInt(selec.parent().text()) > 0)
+    {
+        $('#incomes').removeAttr('style');
+    }
+    else
+    {
+        $('#incomes').css('display','none');
+    }
+};

@@ -64,20 +64,46 @@ public class ToSheets extends HttpServlet {
         JsonElement element = parser.parse(request);
         JsonObject rootObject = element.getAsJsonObject();
 
-        List<String> priorities = Utils.jsotToList(rootObject,"priorities");
-        String otherPriority = rootObject.get("other_priority").getAsString();
-        List<String> fivepoint = Utils.jsotToList(rootObject,"fivepoint");
-        List<String> yesno = Utils.jsotToList(rootObject,"yesno");
-        List<String> question = new ArrayList<String>(){{add(rootObject.get("question").getAsString());}};
-        String additional = rootObject.get("additional").getAsString();
+        String team = "";
+        switch (rootObject.get("team").getAsInt())
+        {
+            case 1 : team = "CAS";
+                break;
+            case 2 : team = "СБУ";
+                break;
+            case 3 : team = "ТЭК";
+                break;
+            case 4 : team = "Ланит";
+                break;
+        }
+        List<Integer> priorities = Utils.jsotToListInt(rootObject,"priorities");
+        //String otherPriority = rootObject.get("other_priority").getAsString();
+        List<Integer> fivepoint = Utils.jsotToListInt(rootObject,"fivepoint");
+        List<Integer> yesno = Utils.jsotToListInt(rootObject,"yesno");
+        List<Integer> question = Utils.jsotToListInt(rootObject,"question");
+        List<String> additional = Utils.jsotToListStr(rootObject,"additional");
+        List<String> otherPriority = Utils.jsotToListStr(rootObject,"other_priority");
+        List<Integer> loyality = Utils.jsotToListInt(rootObject,"loyality");
 
-        String columnToInsert = getColumnToInsert("Результаты Ланит");
-        List<String> id = new ArrayList<>();
-        //updateSheets("Результаты Ланит", "priorities", id,columnToInsert);
-        updateSheets("Результаты Ланит", "priorities", priorities,columnToInsert);
-        updateSheets("Результаты Ланит", "fivepoint", fivepoint,columnToInsert);
-        updateSheets("Результаты Ланит", "yesno", yesno,columnToInsert);
-        updateSheets("Результаты Ланит", "question", question,columnToInsert);
+
+
+        String columnToInsert = getColumnToInsert("Результаты "+team);
+        updateSheets("Результаты "+team, "priorities", priorities,columnToInsert);
+        updateSheets("Результаты "+team, "fivepoint", fivepoint,columnToInsert);
+        updateSheets("Результаты "+team, "yesno", yesno,columnToInsert);
+        updateSheets("Результаты "+team, "question", question,columnToInsert);
+        updateSheets("Результаты "+team, "additional", additional,columnToInsert);
+        updateSheets("Результаты "+team, "other_priority", otherPriority,columnToInsert);
+        updateSheets("Результаты "+team, "loyality", loyality,columnToInsert);
+
+        columnToInsert = getColumnToInsert("Результаты общие");
+        updateSheets("Результаты общие", "priorities", priorities,columnToInsert);
+        updateSheets("Результаты общие", "fivepoint", fivepoint,columnToInsert);
+        updateSheets("Результаты общие", "yesno", yesno,columnToInsert);
+        updateSheets("Результаты общие", "question", question,columnToInsert);
+        updateSheets("Результаты общие", "additional", additional,columnToInsert);
+        updateSheets("Результаты общие", "other_priority", otherPriority,columnToInsert);
+        updateSheets("Результаты общие", "loyality", loyality,columnToInsert);
     }
 
     private void updateSheets (String sheetId, String type, List data,String columnToInsert) throws IOException
@@ -94,6 +120,13 @@ public class ToSheets extends HttpServlet {
             case "yesno" : rows.add("33"); rows.add("37");
                 break;
             case "question" : rows.add(40+Integer.parseInt(data.get(0)+"")+""); rows.add(40+Integer.parseInt(data.get(0)+"")+"");
+                data.set(0,1);
+                break;
+            case "additional" : rows.add("46"); rows.add("46");
+                break;
+            case "other_priority" : rows.add("49"); rows.add("49");
+                break;
+            case "loyality" : rows.add("53"); rows.add("67");
                 break;
         }
 
@@ -165,7 +198,7 @@ public class ToSheets extends HttpServlet {
 
     private String getColumnToInsert(String sheetId) throws IOException
     {
-        String range = "'" + sheetId + "'!A2:Z2";
+        String range = "'" + sheetId + "'!2:2";
         ValueRange resp = service.spreadsheets().values().get(spreadsheetId,range).setMajorDimension("COLUMNS").execute();
         int fistChar = 0;
         int secondChar = resp.getValues().size()+1;
