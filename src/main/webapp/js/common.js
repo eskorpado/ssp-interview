@@ -11,11 +11,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         {value: 0, label: "Содержание работы (интересные, значимые для Вас задачи,  проекты и др.)", show: -1},
         {value: 1, label: "Уровень оплаты труда (зарплата, премии)", show: -1},
         {value: 2, label: "Возможность больше зарабатывать от приложенных усилий", show: -1},
-        {
-            value: 3,
-            label: "Признание руководством и коллегами Ваших профессиональных и трудовых заслуг (Доска почета, грамота и т.п.)",
-            show: -1
-        },
+        {value: 3, label: "Признание руководством и коллегами Ваших профессиональных и трудовых заслуг (Доска почета, грамота и т.п.)", show: -1},
         {value: 4, label: "Условия работы", show: -1},
         {value: 5, label: "Перспектива построения карьеры", show: -1},
         {value: 6, label: "Повышение профессионализма", show: -1},
@@ -23,102 +19,31 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         {value: 8, label: "Атмосфера в команде, хороший, дружный коллектив", show: -1},
         {value: 9, label: "Иной", show: -1}
     ];
-    $scope.isHidden = function (index, item) {
-        var i = $scope.priorities.indexOf(item);
-        if ($scope.priorities[i].show == index || $scope.priorities[i].show == -1) { //alert($scope.priorities[i].show);
-            return false;
-        }
-        return true;
-    };
-    $scope.changeOptions = function (selected, index) {
-        $scope.priorities[selected-1].show = index;
-        $scope.priorities.forEach(function (item, i, arr) {
-            if (item.show == index && i != selected-1) {
-                item.show = -1;
-            }
-        })
-    };
-    $scope.isOthers = function () {
-        if ($scope.priorities[9].show == -1) {
-            return true;
-        }
-        return false;
-    };
-
     $scope.fivepoint = [
         {id: 0, value: "Четко ли распределены функции и задачи в подразделении?"},
-        {
-            id: 1,
-            value: "Понимаете ли Вы что должны делать на своей работе, чтобы способствовать достижению целей компании?"
-        },
+        {id: 1, value: "Понимаете ли Вы что должны делать на своей работе, чтобы способствовать достижению целей компании?"},
         {id: 2, value: "Устраивает ли Вас обеспечение рабочего места всем необходимым?"},
         {id: 3, value: "Устраивает ли Вас содержание самой работы?"},
         {id: 4, value: "Получаете ли Вы достаточно информации для решения поставленных задач?"},
-        {
-            id: 5,
-            value: "Знаете ли Вы к кому можно обратиться для решения ваших проблем, кроме непосредственного руководителя?"
-        },
+        {id: 5, value: "Знаете ли Вы к кому можно обратиться для решения ваших проблем, кроме непосредственного руководителя?"},
         {id: 6, value: "Ощущаете ли Вы помощь и поддержку в работе со стороны руководителя подразделения?"},
-        {
-            id: 7,
-            value: "Рассматриваются ли руководителем подразделения Ваши предложения по усовершенствованию работы?"
-        },
-        {
-            id: 8,
-            value: "Понимаете ли Вы принцип начисления дополнительных бонусов к заработной плате и что нужно делать для их получения?"
-        },
-        {
-            id: 9,
-            value: "Прикладываете ли Вы усилия для достижения больших результатов и получения дополнительных бонусов?"
-        },
-        {
-            id: 10,
-            value: "Учитываются ли Ваши усилия и достижения при начислении бонусов руководителем направления?"
-        },
+        {id: 7, value: "Рассматриваются ли руководителем подразделения Ваши предложения по усовершенствованию работы?"},
+        {id: 8, value: "Понимаете ли Вы принцип начисления дополнительных бонусов к заработной плате и что нужно делать для их получения?"},
+        {id: 9, value: "Прикладываете ли Вы усилия для достижения больших результатов и получения дополнительных бонусов?"},
+        {id: 10, value: "Учитываются ли Ваши усилия и достижения при начислении бонусов руководителем направления?"},
         {id: 11, value: "Имеете ли Вы возможность продвижения по карьерной лестнице?"},
         {id: 12, value: "Имеете ли Вы возможность повышения своей квалификации?"},
         {id: 13, value: "Устраивают ли Вас взаимоотношения с коллегами по работе?"},
         {id: 14, value: "Устраивает ли вас состояние вспомогательных помещений (кухня, душ…)?"},
-
-        {
-            id: 15,
-            value: "Если вы имеете дополнительный источник дохода в виде подработки, оцените насколько он значим для Вас?"
-        }
+        {id: 15, value: "Если вы имеете дополнительный источник дохода в виде подработки, оцените насколько он значим для Вас?" }
     ];
-
-
-    $scope.incomes = function () {
-        //alert($('#fivepoint .btn-group').last().find('input:checked').text());
-        alert('in scope');
-        //alert(parseInt($('#fivepoint .btn-group').last().find('input:checked').parent().text()))
-      /*if ($('#fivepoint .btn-group').last().find('input:checked').text() != "")
-      {
-          $scope.hideIncomes = true;
-      }
-      else {
-          $scope.hideIncomes = false;
-      }*/
-    };
-
-    $('input [type=radio][name=fivepoint15]').change(function () {
-       alert($(this).parent().text());
-    });
-
-
-    $scope.hideIncomes = true;
-
-
     $scope.yesno = [
         {id: 0, value: "Дает ли уверенность в завтрашнем дне работа в компании?"},
-        {
-            id: 1,
-            value: "Есть ли у Вас «командный дух»? Готовы ли Вы без особых просьб помочь коллеге при решении задачи?"
-        },
+        {id: 1, value: "Есть ли у Вас «командный дух»? Готовы ли Вы без особых просьб помочь коллеге при решении задачи?"},
         {id: 2, value: "Останетесь ли вы после работы помочь коллеге, который не успевает завершить задачу?"},
         {id: 3, value: "Готовы ли вы участвовать в спортивных соревнованиях, проводимых компанией?"},
         {id: 4, value: "Готовы ли вы принимать участие в соревнованиях между командами?"}
     ];
-
     $scope.question = [
         "Я удовлетворен(а) работой в компании и не хотел(а) бы менять место работы",
         "Я удовлетворен(а) работой в компании, но хотел(а) бы сменить место работы по объективным обстоятельствам",
@@ -127,40 +52,45 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         "Я не задумывался (не задумывалась) над этим вопросом"
     ];
     $scope.loyality = [
-        {
-            id: 0,
-            value: "Я готов приложить усилия, даже превышающие общепринятые ожидания, чтобы моя компания преуспевала"
-        },
+        {id: 0, value: "Я готов приложить усилия, даже превышающие общепринятые ожидания, чтобы моя компания преуспевала"},
         {id: 1, value: "Я всегда говорю своим друзьям, что работаю в великолепной компании"},
         {id: 2, value: "Я не испытываю никакой привязанности по отношению к этой компании"},
         {id: 3, value: "Я соглашусь практически с любым назначением, лишь бы остаться работать в этой компании"},
         {id: 4, value: "Я считаю, что мои личные ценности и ценности, принятые в моей компании, очень близки"},
         {id: 5, value: "Я с гордостью заявляю другим, что являюсь частью этой компании"},
-        {
-            id: 6,
-            value: "С таким же успехом я работал бы в любой другой компании, если бы можно было выполнять аналогичную работу"
-        },
+        {id: 6, value: "С таким же успехом я работал бы в любой другой компании, если бы можно было выполнять аналогичную работу"},
         {id: 7, value: "Моя компания действительно вдохновляет меня работать как можно лучше"},
-        {
-            id: 8,
-            value: "Требуются очень незначительные изменения в моих личных обстоятельствах, чтобы я оставил работу в этой компании"
-        },
-        {
-            id: 9,
-            value: "Я очень рад, что выбрал именно эту компанию, когда искал работу и рассматривал другие предложения"
-        },
+        {id: 8, value: "Требуются очень незначительные изменения в моих личных обстоятельствах, чтобы я оставил работу в этой компании"},
+        {id: 9, value: "Я очень рад, что выбрал именно эту компанию, когда искал работу и рассматривал другие предложения"},
         {id: 10, value: "Не имеет смысла надолго задерживаться в этой компании "},
-        {
-            id: 11,
-            value: "Во многих случаях я не согласен с основными направлениями политики компании по отношению к своим сотрудникам"
-        },
+        {id: 11, value: "Во многих случаях я не согласен с основными направлениями политики компании по отношению к своим сотрудникам"},
         {id: 12, value: "Мне действительно небезразлична судьба компании"},
         {id: 13, value: "Для меня это самая лучшая из компаний, где я мог бы работать"},
         {id: 14, value: "Решение начать работать в этой компании было, безусловно, ошибкой с моей стороны"}
     ];
+
+    //priorities
+    $scope.isHidden = function (index, item) {
+        var i = $scope.priorities.indexOf(item);
+
+        return !($scope.priorities[i].show === index || $scope.priorities[i].show === -1);
+
+    };
+    $scope.changeOptions = function (selected, index) {
+        $scope.priorities[selected-1].show = index;
+        $scope.priorities.forEach(function (item, i) {
+            if (item.show === index && i !== selected-1) {
+                item.show = -1;
+            }
+        })
+    };
+    $scope.isOthers = function () {
+        return $scope.priorities[9].show === -1;
+    };
+
     $scope.nextButton = function () {
         $('#firstPart select, #firstPart input').filter('[required]:visible').each(function () {
-            if ($(this).val() == "" || $(this).val() == null || $(this).val() == undefined)
+            if ($(this).val() === "" || $(this).val() === null || $(this).val() === undefined)
                 $(this).parents('.form-group').addClass('has-error');
             else
                 $(this).parents('.form-group').removeClass('has-error');
@@ -179,7 +109,6 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         }
     };
 
-
     $scope.finishButton = function () {
         $('#secondPart .btn-group-vertical, #secondPart .btn-group').has("input[required]").each(function () {
             $(this).removeClass('has-error');
@@ -190,6 +119,9 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
         $('#secondPart .has-error select, #secondPart .has-error input').first().focus();
         if ($('#secondPart .has-error').length <= 0) {
+
+            var team = $('#team select').val();
+
             var items = [];
             $('#priorities select').not('#last').each(function (index) {
                 items.push({name :index+1, value: $(this).val()});
@@ -205,11 +137,8 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
                 return 0;
 
             });
-
-            var team = $('#team select').val();
-
             var priorities = [];
-            items.forEach(function (element, index, array) {
+            items.forEach(function (element) {
                 priorities.push(element.name);
             });
 
@@ -239,7 +168,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             });
             var inverse = [2,6,8,10,11,14];
             inverse.forEach(function (element) {
-               loyality[element] = 5 - loyality[element];
+               loyality[element] = 6 - loyality[element];
             });
 
             var req = {
@@ -262,6 +191,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
             $('#thirdPart').css('display', 'block');
         }
     };
+
     $scope.previousButton = function () {
         $('#secondPart').css('display', 'none');
         $('#firstPart').css('display', 'block');
@@ -270,12 +200,15 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
 
 })();
 var showIncomes = function (selec) {
-    if(parseInt(selec.parent().text()) > 0)
+    if (selec.attr('name') == 'fivepoint15')
     {
-        $('#incomes').removeAttr('style');
-    }
-    else
-    {
-        $('#incomes').css('display','none');
+        if(parseInt(selec.parent().text()) > 0)
+        {
+            $('#incomes').removeAttr('style');
+        }
+        else
+        {
+            $('#incomes').css('display','none');
+        }
     }
 };

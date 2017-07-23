@@ -1,17 +1,13 @@
 package ru.ssp;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by KrutovBS on 19.07.2017.
- */
-public class Utils {
-    public static List<String> jsotToListStr(JsonObject jsonObject, String key)
+class Utils {
+    static List<String> jsonToListStr(JsonObject jsonObject, String key)
     {
         List<String> list = new ArrayList<>();
         try {
@@ -29,7 +25,7 @@ public class Utils {
         }
         return list;
     }
-    public static List<Integer> jsotToListInt(JsonObject jsonObject, String key)
+    static List<Integer> jsonToListInt(JsonObject jsonObject, String key)
     {
         List<Integer> list = new ArrayList<>();
         try {

@@ -1,8 +1,6 @@
 package ru.ssp;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -10,46 +8,29 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
-/**
- * Created by KrutovBS on 18.07.2017.
- */
 @WebServlet("/tosheet")
-public class ToSheets extends HttpServlet {
+public class ToSheet extends HttpServlet {
 
     private String spreadsheetId = "1XUUdErflFkHpzOSkH3QZOTsL45nXBRFQTIn5aOVCH1A";
-    public HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-    public JsonFactory JSON_FACTORY = new JacksonFactory();
-    public AppIdentityCredential CREDENTIAL = new AppIdentityCredential(SheetsScopes.all());
-    public Sheets service = new Sheets.Builder(HTTP_TRANSPORT,JSON_FACTORY,CREDENTIAL).setApplicationName("SSP-Interview").build();
+    private HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+    private JsonFactory JSON_FACTORY = new JacksonFactory();
+    private AppIdentityCredential CREDENTIAL = new AppIdentityCredential(SheetsScopes.all());
+    private Sheets service = new Sheets.Builder(HTTP_TRANSPORT,JSON_FACTORY,CREDENTIAL).setApplicationName("SSP-Interview").build();
 
 
     @Override
@@ -57,7 +38,6 @@ public class ToSheets extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=utf-8");
-        PrintWriter out = resp.getWriter();
 
         String request = req.getParameter("request");
         JsonParser parser = new JsonParser();
@@ -76,14 +56,13 @@ public class ToSheets extends HttpServlet {
             case 4 : team = "Ланит";
                 break;
         }
-        List<Integer> priorities = Utils.jsotToListInt(rootObject,"priorities");
-        //String otherPriority = rootObject.get("other_priority").getAsString();
-        List<Integer> fivepoint = Utils.jsotToListInt(rootObject,"fivepoint");
-        List<Integer> yesno = Utils.jsotToListInt(rootObject,"yesno");
-        List<Integer> question = Utils.jsotToListInt(rootObject,"question");
-        List<String> additional = Utils.jsotToListStr(rootObject,"additional");
-        List<String> otherPriority = Utils.jsotToListStr(rootObject,"other_priority");
-        List<Integer> loyality = Utils.jsotToListInt(rootObject,"loyality");
+        List<Integer> priorities = Utils.jsonToListInt(rootObject,"priorities");
+        List<Integer> fivepoint = Utils.jsonToListInt(rootObject,"fivepoint");
+        List<Integer> yesno = Utils.jsonToListInt(rootObject,"yesno");
+        List<Integer> question = Utils.jsonToListInt(rootObject,"question");
+        List<String> additional = Utils.jsonToListStr(rootObject,"additional");
+        List<String> otherPriority = Utils.jsonToListStr(rootObject,"other_priority");
+        List<Integer> loyality = Utils.jsonToListInt(rootObject,"loyality");
 
 
 
@@ -130,26 +109,16 @@ public class ToSheets extends HttpServlet {
                 break;
         }
 
-        String column = columnToInsert;
-
-        String range =  "'" + sheetId + "'!" + column + rows.get(0) + ":" + column + rows.get(1);
+        String range =  "'" + sheetId + "'!" + columnToInsert + rows.get(0) + ":" + columnToInsert + rows.get(1);
         ValueRange resp = new ValueRange();
         resp.setRange(range);
         resp.setMajorDimension("COLUMNS");
         List<List<Object>> values = new ArrayList<>();
-        /*List<Object> value = new ArrayList<>();
-        for (String s:
-             data) {
-            value.add(s);
-
-        }
-        value.addAll()*/
         values.add(data);
         resp.setValues(values);
 
         BatchUpdateValuesRequest batchRequest = new BatchUpdateValuesRequest();
         batchRequest.setValueInputOption("RAW");
-        List<Request> requests = new ArrayList<>();
 
 
         List<ValueRange> updateValueRangeList = new ArrayList<>();
@@ -157,41 +126,7 @@ public class ToSheets extends HttpServlet {
 
         batchRequest.setData(updateValueRangeList);
 
-        BatchUpdateValuesResponse updateResponse = service.spreadsheets().
-                values().batchUpdate(spreadsheetId, batchRequest).
-                execute();
-    }
-
-    private void addAditionalQuestion (String sheetId, String data) throws IOException
-    {
-
-        if (StringUtils.isBlank(data))
-        {
-            return;
-        }
-        String range = "'" + sheetId + "'!B";
-        ValueRange resp = service.spreadsheets().values().get(spreadsheetId,range).execute();
-        resp.setMajorDimension("ROWS");
-        String row = resp.getValues().size()+"";
-
-        range = "'" + sheetId + "'B" + row;
-        resp = new ValueRange();
-        resp.setRange(range);
-        List<List<Object>> values = new ArrayList<>();
-        List<Object> value = new ArrayList<>();
-        value.add(0,data);
-        values.add(0, value);
-        resp.setValues(values);
-
-        BatchUpdateValuesRequest batchRequest = new BatchUpdateValuesRequest();
-        batchRequest.setValueInputOption("RAW");
-
-        List<ValueRange> updateValueRangeList = new ArrayList<>();
-        updateValueRangeList.add(resp);
-
-        batchRequest.setData(updateValueRangeList);
-
-        BatchUpdateValuesResponse updateResponse = service.spreadsheets().
+        service.spreadsheets().
                 values().batchUpdate(spreadsheetId, batchRequest).
                 execute();
     }
