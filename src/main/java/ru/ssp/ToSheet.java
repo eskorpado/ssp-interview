@@ -55,6 +55,12 @@ public class ToSheet extends HttpServlet {
                 break;
             case 4 : team = "Ланит";
                 break;
+            case 5 : team = "НЗР";
+                break;
+            case 6 : team = "АУП";
+                break;
+            case 7 : team = "О.Дизайна";
+                break;
         }
         List<Integer> priorities = Utils.jsonToListInt(rootObject,"priorities");
         List<Integer> fivepoint = Utils.jsonToListInt(rootObject,"fivepoint");

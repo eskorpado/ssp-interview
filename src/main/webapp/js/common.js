@@ -5,7 +5,10 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         {value: 0, label: "CAS"},
         {value: 0, label: "СБУ"},
         {value: 0, label: "ТЭК"},
-        {value: 0, label: "Ланит"}
+        {value: 0, label: "Ланит"},
+        {value: 0, label: "НЗР"},
+        {value: 0, label: "АУП"},
+        {value: 0, label: "Отдел дизайна"}
     ];
     $scope.priorities = [
         {value: 0, label: "Содержание работы (интересные, значимые для Вас задачи,  проекты и др.)", show: -1},
@@ -106,6 +109,7 @@ sspInterviewApp.controller("interviewCtrl", function ($scope) {
         if ($('#firstPart .has-error:visible').length <= 0) {
             $('#firstPart').css('display', 'none');
             $('#secondPart').css('display', 'block');
+            $('#secondPart input').first().focus();
         }
     };
 

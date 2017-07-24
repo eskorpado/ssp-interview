@@ -14,10 +14,6 @@ repositories {   // repositories for JARs you access in your code
         url 'https://maven-central.storage.googleapis.com'             // Google's mirror of Maven Central
     }
 
-//maven {
-//  url 'https://oss.sonatype.org/content/repositories/snapshots' // SNAPSHOT repository if needed
-//}
-
     jcenter()
     mavenCentral()
 }
@@ -49,10 +45,6 @@ gretty {
 }
 
 appengine {
-    run {
-        jvmFlags = ['-Dappengine.fullscan.seconds=5']
-    }
-
     deploy {   // deploy configuration
         stopPreviousVersion = true  // default - stop the current version
         promote = true              // default - & make this the current version
@@ -60,8 +52,8 @@ appengine {
 
 }
 
-group = 'com.example.appengine'   // Generated output GroupId
-version = '1.0-SNAPSHOT'          // Version in generated output
+group = 'ru.ssp'   // Generated output GroupId
+version = '1.0'          // Version in generated output
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
